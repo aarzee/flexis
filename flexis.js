@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'yellow',
     'blue',
     'red',
-    'green',
+    'limegreen',
     'cyan',
     'orange',
-    'empty'
+    'hotpink'
   ];
 
   const randomColor = () => COLORS[Math.random() * COLORS.length | 0];
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const moveForward = () => {
     colorsArray[boxIndex] = 'empty';
     boxIndex = (boxIndex + 1) % 200;
-    colorsArray[boxIndex] = COLORS[((boxIndex / 10) | 0) % 6];
+    colorsArray[boxIndex] = COLORS[((boxIndex / 10) | 0) % COLORS.length];
     updateColors();
   }
 
