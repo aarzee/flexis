@@ -52,7 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const moveForward = () => {
     colorsArray[boxIndex] = 'empty';
-    colorsArray[++boxIndex] = 'blue';
+    boxIndex = (boxIndex + 1) % 200;
+    colorsArray[boxIndex] = COLORS[((boxIndex / 10) | 0) % 6];
     updateColors();
   }
 
