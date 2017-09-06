@@ -1,0 +1,30 @@
+$colors: yellow, blue, red, green, cyan, orange;
+
+#boxes {
+  width: 200px;
+  height: 400px;
+  padding: 0;
+  line-height: 0;
+  div {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    box-sizing: border-box;
+    border: 3px outset;
+    @each $color in $colors {
+      &.#{"" + $color} {
+        background: $color;
+        border-color: $color;
+      }
+    }
+
+    &.empty {
+      background: #222;
+      border: 2px solid #444;
+      border-top: none;
+      border-right: none;
+    }
+  }
+}
