@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  let boxIndex = 0;
+  let boxIndex = 199;
 
   const moveForward = () => {
     colorsArray[boxIndex] = 'empty';
