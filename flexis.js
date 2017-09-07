@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentTopLeft = [4, 0];
 
   let currentRotation = 0;
-  let currentTetromino = 'l';
+  let currentTetromino = randomTetromino();
 
   const tetrominoPositions = (tetromino, rotation, topLeft) => {
     const shape = TETROMINO_SHAPES[tetromino][rotation];
@@ -260,6 +260,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const illegalPosition = ([x, y]) => x < 0 || x > 9 || y < 0 || y > 19;
 
+  const drop = () => {
+    if (tetrominoAtRest(currentTetromino, currentRotation, currentTopLeft)) {
+      currentTetromino = randomTetromino();
+      currentRotation = 0;
+      currentTopLeft = [4, 0];
+    }
+    else {
+      removeTetromino(currentTetromino, currentRotation, currentTopLeft);
+      const [x, y] = currentTopLeft;
+      currentTopLeft = [x, y + 1];
+    }
+    putTetromino(currentTetromino, currentRotation, currentTopLeft);
+    updateColors();
+  }
+
   const putTetromino = (tetromino, rotation, topLeft) => {
     tetrominoPositions(tetromino, rotation, topLeft).forEach(([x, y]) => colorsArray[coordToIndex(x, y)] = TETROMINO_COLORS[tetromino]);
   };
@@ -270,8 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const [x, y] = positions[i];
       if (y === 19)
         return true;
-      const below = [x, y + 1];
-      if (!positions.includes(below) && colorsArray[coordToIndex(x, y + 1)] !== 'empty')
+      const belowY = y + 1;
+      const included = positions.reduce((accum, [posX, posY]) => accum || (posX === x && posY === belowY), false);
+      if (!included && colorsArray[coordToIndex(x, y + 1)] !== 'empty')
         return true;
     }
     return false;
@@ -293,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const moveLeft = () => {
     const [topLeftX, topLeftY] = currentTopLeft;
     removeTetromino(currentTetromino, currentRotation, currentTopLeft);
-    debugger;
     if (positionsAreLegal(tetrominoPositions(currentTetromino, currentRotation, [topLeftX - 1, topLeftY])))
       currentTopLeft = [topLeftX - 1, topLeftY];
     putTetromino(currentTetromino, currentRotation, currentTopLeft);
@@ -365,6 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else rotate();
     ticks++;
   }
+
+  setInterval(drop, 500);
 
   document.addEventListener('keydown', e => {
     switch (e.keyCode) {
