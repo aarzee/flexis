@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     boxesContainer.appendChild(box);
     boxes.push(box);
   }
-
+  let dropInterval;
   const colorsBuffer = new Array(200);
 
   let i = 200;
@@ -260,20 +260,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const illegalPosition = ([x, y]) => x < 0 || x > 9 || y < 0 || y > 19;
 
+  const stopDrop = () => clearInterval(dropInterval);
+
+  const flashLines = lines => {
+    const lineColors = {};
+    for(let i = 0; i < lines.length; i++) {
+      const lineNum = lines[i];
+      const line = [];
+      for(let j = 0; j < 10; j++) {
+        line.push(colorsArray[coordToIndex(j, lineNum)]);
+      }
+      lineColors[lineNum] = line;
+    }
+    const flashWhite = () => {
+      for(let i = 0; i < lines.length; i++) {
+        const lineNum = lines[i];
+        for(let j = 0; j < 10; j++) {
+          colorsArray[coordToIndex(j, lineNum)] = 'flash';
+        }
+      }
+      updateColors();
+    };
+    const flashColor = () => {
+      for(let i = 0; i < lines.length; i++) {
+        const lineNum = lines[i];
+        for(let j = 0; j < 10; j++) {
+          colorsArray[coordToIndex(j, lineNum)] = lineColors[lineNum][j];
+        }
+      }
+      updateColors();
+    };
+    const shuffleLines = () => {
+
+      for(let i = 19; i >= 0; i--) {
+        if(lines.includes(i)) continue;
+        let linesBelow = 0;
+        for(let j = 0; j < lines.length; j++) {
+          if (lines[j] > i) linesBelow++;
+        }
+        debugger;
+        if(linesBelow !== 0) {
+          const newLine = i + linesBelow;
+          for(let j = 0; j < 10; j++) {
+            colorsArray[coordToIndex(j, newLine)] = colorsArray[coordToIndex(j, i)];
+            colorsArray[coordToIndex(j, i)] = 'empty';
+          }
+        }
+      }
+      updateColors();
+    };
+    const flashEmpty = () => {
+      for(let i = 0; i < lines.length; i++) {
+        const lineNum = lines[i];
+        for(let j = 0; j < 10; j++) {
+          colorsArray[coordToIndex(j, lineNum)] = 'empty';
+        }
+      }
+    };
+    flashWhite();
+    setTimeout(flashColor, 250);
+    setTimeout(flashWhite, 500);
+    setTimeout(flashColor, 750);
+    setTimeout(flashWhite, 1000);
+    setTimeout(() => { flashEmpty(); shuffleLines(); startDrop(); }, 1250);
+  };
+
+  const checkForLines = () => {
+    const lines = [];
+    for(let i = 0; i < 20; i++) {
+      let isFull = true;
+      for(let j = 0; j < 10; j++) {
+        if (colorsArray[coordToIndex(j, i)] === 'empty') {
+          isFull = false;
+          break;
+        }
+      }
+      if (isFull) lines.push(i);
+    }
+    if (lines.length !== 0) {
+      stopDrop();
+      flashLines(lines);
+      return true;
+    }
+    return false;
+  };
+
   const drop = () => {
+    let shouldDraw = true;
     if (tetrominoAtRest(currentTetromino, currentRotation, currentTopLeft)) {
       currentTetromino = randomTetromino();
       currentRotation = 0;
       currentTopLeft = [4, 0];
+      shouldDraw = !checkForLines();
     }
     else {
       removeTetromino(currentTetromino, currentRotation, currentTopLeft);
       const [x, y] = currentTopLeft;
       currentTopLeft = [x, y + 1];
     }
-    putTetromino(currentTetromino, currentRotation, currentTopLeft);
+    if (shouldDraw) putTetromino(currentTetromino, currentRotation, currentTopLeft);
     updateColors();
   }
+
+  const startDrop = () => dropInterval = setInterval(drop, 500);
 
   const putTetromino = (tetromino, rotation, topLeft) => {
     tetrominoPositions(tetromino, rotation, topLeft).forEach(([x, y]) => colorsArray[coordToIndex(x, y)] = TETROMINO_COLORS[tetromino]);
@@ -349,7 +438,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let [newTopLeftX, newTopLeftY] = currentTopLeft;
 
     const { left, right, up, down } = extremities(newPositions);
-    console.log(left, right, up, down);
     if (left < 0) newTopLeftX -= left;
     if (right > 9) newTopLeftX -= (right - 9);
     if (up < 0) newTopLeftY += up;
@@ -381,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ticks++;
   }
 
-  setInterval(drop, 500);
+  startDrop();
 
   document.addEventListener('keydown', e => {
     switch (e.keyCode) {

@@ -26,5 +26,10 @@ $colors: yellow, blue, red, limegreen, cyan, orange, hotpink;
       border-top: none;
       border-right: none;
     }
+
+    &.flash {
+      background: white;
+      border: none;
+    }
   }
 }
