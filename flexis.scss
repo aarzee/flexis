@@ -1,6 +1,50 @@
 $colors: yellow, blue, red, limegreen, cyan, orange, hotpink;
 
+#root {
+  font-family: Helvetica, sans-serif;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#container {
+  background: purple;
+  color: white;
+  width: 400px;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+#info {
+  width: 125px;
+  height: 400px;
+  margin-right: 25px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  * {
+    margin: 5px;
+  }
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    list-style: none;
+    text-align: left;
+  }
+}
+
 #boxes {
+  margin-left: 25px;
   width: 200px;
   height: 400px;
   padding: 0;
